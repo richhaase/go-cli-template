@@ -1,0 +1,123 @@
+# mycli
+
+Brief description of what this CLI does.
+
+## Using This Template
+
+This is a GitHub template repository. To create a new CLI project:
+
+### Option 1: GitHub Template (Recommended)
+
+1. Click "Use this template" on GitHub
+2. Clone your new repository
+3. Run the bootstrap script:
+
+```bash
+./scripts/rename.sh -o myuser -r my-cli
+```
+
+### Option 2: Manual Clone
+
+```bash
+git clone https://github.com/OWNER/REPO.git my-cli
+cd my-cli
+rm -rf .git
+git init
+./scripts/rename.sh -o myuser -r my-cli
+```
+
+### Bootstrap Options
+
+```bash
+./scripts/rename.sh --help
+
+# Interactive mode
+./scripts/rename.sh
+
+# Non-interactive
+./scripts/rename.sh -o myuser -r my-cli -b mycmd -d "My awesome CLI tool"
+
+# Skip confirmation
+./scripts/rename.sh -o myuser -r my-cli -y
+```
+
+---
+
+## Installation
+
+### From source
+
+```bash
+go install github.com/OWNER/REPO/cmd/mycli@latest
+```
+
+### From releases
+
+Download the latest binary from [Releases](https://github.com/OWNER/REPO/releases).
+
+### Using just
+
+```bash
+git clone https://github.com/OWNER/REPO.git
+cd REPO
+just install
+```
+
+## Usage
+
+```bash
+mycli [command] [flags]
+```
+
+### Commands
+
+- `example` - An example command to demonstrate patterns
+- `version` - Print version information
+
+### Examples
+
+```bash
+# Run the example command
+mycli example "Hello"
+
+# With flags
+mycli example --name "Developer" --count 3
+
+# Check version
+mycli version
+```
+
+## Development
+
+This project uses [just](https://github.com/casey/just) as a command runner.
+
+```bash
+# List available commands
+just
+
+# Build the binary
+just build
+
+# Run tests
+just test
+
+# Run all quality checks
+just check
+
+# Clean build artifacts
+just clean
+```
+
+### Pre-commit hooks
+
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Install hooks
+pre-commit install
+```
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.

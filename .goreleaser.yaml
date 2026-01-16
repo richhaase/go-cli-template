@@ -1,0 +1,70 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+    - go test ./...
+
+builds:
+  - main: ./cmd/mycli
+    binary: mycli
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      # - windows  # Uncomment if you need Windows support
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.ShortCommit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    formats:
+      - tar.gz
+    # Windows gets zip format if enabled
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
+      - "^style:"
+      - Merge pull request
+      - Merge branch
+
+release:
+  github:
+    owner: OWNER
+    name: REPO
+  draft: false
+  prerelease: auto
+  name_template: "{{.ProjectName}} v{{.Version}}"
+
+# Uncomment for Homebrew tap publishing
+# brews:
+#   - repository:
+#       owner: OWNER
+#       name: homebrew-tap
+#     homepage: https://github.com/OWNER/REPO
+#     description: "Brief description of your CLI"
+#     license: MIT
+#     install: |
+#       bin.install "mycli"
+#     test: |
+#       system "#{bin}/mycli", "version"
