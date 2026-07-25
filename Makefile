@@ -34,15 +34,18 @@ build:
 	COMMIT=$$(git rev-parse --short HEAD 2>/dev/null || echo "none"); \
 	DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ"); \
 	go build -ldflags "-X main.version=$$VERSION -X main.commit=$$COMMIT -X main.date=$$DATE" \
-		-o $(BIN_DIR)/$(BINARY) $(CMD_PATH); \
+		-o $(BIN_DIR)/$(BINARY) $(CMD_PATH) && \
 	echo "Built $(BIN_DIR)/$(BINARY) ($$VERSION)"
 
 install:
 	@VERSION=$$(git describe --tags --always --dirty 2>/dev/null || echo "dev"); \
 	COMMIT=$$(git rev-parse --short HEAD 2>/dev/null || echo "none"); \
 	DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ"); \
-	go install -ldflags "-X main.version=$$VERSION -X main.commit=$$COMMIT -X main.date=$$DATE" $(CMD_PATH); \
-	echo "Installed $(BINARY) to $$(go env GOBIN 2>/dev/null || echo "$$(go env GOPATH)/bin")"
+	go install -ldflags "-X main.version=$$VERSION -X main.commit=$$COMMIT -X main.date=$$DATE" $(CMD_PATH) && { \
+		BINDIR=$$(go env GOBIN); \
+		[ -n "$$BINDIR" ] || BINDIR="$$(go env GOPATH)/bin"; \
+		echo "Installed $(BINARY) to $$BINDIR"; \
+	}
 
 run: build
 	@./$(BIN_DIR)/$(BINARY) $(ARGS)
