@@ -19,6 +19,7 @@ linters:
   settings:
     errcheck:
       exclude-functions:
+        - fmt.Fprint
         - fmt.Fprintf
         - fmt.Fprintln
         - (io.Closer).Close

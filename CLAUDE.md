@@ -44,9 +44,17 @@ make clean             # Clean build artifacts
 ### Adding a New Command
 
 1. Create a new file in `internal/cli/` (e.g., `mycommand.go`)
-2. Define the command with `&cobra.Command{}`
-3. Add flags in `init()` using `cmd.Flags().TypeVarP()`
-4. Register with `rootCmd.AddCommand(myCmd)` in `init()`
+2. Write a `newMyCommandCmd() *cobra.Command` constructor
+3. Declare flag variables as locals inside it and bind them with
+   `cmd.Flags().TypeVarP(&local, ...)`, so the `RunE` closure reads them
+4. Register it in `NewRootCmd`'s `AddCommand` call
+
+Commands are built by constructor rather than declared as package-level vars
+wired up in `init()`. Flag values then live in the closure instead of in
+globals, which is what lets a test build the tree as many times as it likes in
+one process. With globals, pflag writes the parsed value into the shared
+variable and nothing resets it, so a later run reading the same flag sees the
+previous run's value.
 
 ### Context and Cancellation
 
@@ -66,6 +74,23 @@ make clean             # Clean build artifacts
 
 - Write command output with `fmt.Fprintf(cmd.OutOrStdout(), ...)` rather than
   `fmt.Printf` so tests can capture it
+
+### JSON Output
+
+If the CLI grows a `--json` mode, three standard-library behaviours will bite:
+
+- `encoding/json` HTML-escapes `<`, `>` and `&`, so user-supplied text comes
+  back as `\u003c`. Encode through a `json.Encoder` with
+  `SetEscapeHTML(false)` and route every call site through it.
+- Marshalling a `map` sorts its keys. Payloads whose field order is part of the
+  contract must be structs, where order follows declaration.
+- A custom `MarshalJSON` that calls `json.Marshal` internally re-introduces
+  escaping, because the outer encoder's `SetEscapeHTML(false)` cannot undo work
+  already done inside.
+
+And when caching an API response, unmarshalling into a struct silently drops
+fields the struct does not model. Keeping the raw bytes alongside the parsed
+form, and re-marshalling those, preserves what the struct does not know about.
 
 ### Version Injection
 
@@ -97,7 +122,10 @@ stdlib paths. Bump it to a current patch release; do not round it down.
 
 - Tests live alongside code: `foo.go` → `foo_test.go`
 - Use table-driven tests for multiple cases (see `internal/cli/example_test.go`)
-- Drive Cobra commands via `rootCmd.SetArgs` + `SetOut`/`SetErr` buffers
+- Drive Cobra commands by calling `NewRootCmd` per invocation, then
+  `SetArgs` + `SetOut`/`SetErr` buffers (see `executeCommand` in
+  `internal/cli/example_test.go`). Building a fresh tree each time is what
+  keeps cases independent; there is no flag state to reset by hand.
 - Use `t.TempDir()` for temp directories and `t.Setenv()` for env vars
   (see `internal/config/config_test.go`)
 

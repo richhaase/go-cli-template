@@ -10,17 +10,14 @@ import (
 func executeCommand(t *testing.T, ctx context.Context, args ...string) (string, error) {
 	t.Helper()
 
-	exampleName = "World"
-	exampleCount = 1
-
-	exampleCmd.SetContext(ctx)
+	root := NewRootCmd(BuildInfo{Version: "test", Commit: "none", Date: "unknown"})
 
 	buf := new(bytes.Buffer)
-	rootCmd.SetOut(buf)
-	rootCmd.SetErr(buf)
-	rootCmd.SetArgs(args)
+	root.SetOut(buf)
+	root.SetErr(buf)
+	root.SetArgs(args)
 
-	err := rootCmd.ExecuteContext(ctx)
+	err := root.ExecuteContext(ctx)
 	return buf.String(), err
 }
 
@@ -81,5 +78,19 @@ func TestExampleCommandCanceledContext(t *testing.T) {
 	}
 	if out != "" {
 		t.Errorf("output = %q, want empty", out)
+	}
+}
+
+func TestFlagsDoNotLeakBetweenRuns(t *testing.T) {
+	if _, err := executeCommand(t, context.Background(), "example", "--name", "Gopher", "--count", "3"); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := executeCommand(t, context.Background(), "example")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != "Hello, World!\n" {
+		t.Fatalf("second run saw state from the first: %q", got)
 	}
 }

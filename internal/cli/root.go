@@ -9,21 +9,27 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	versionInfo struct {
-		version string
-		commit  string
-		date    string
-	}
+// BuildInfo carries the values injected at build time via ldflags.
+type BuildInfo struct {
+	Version string
+	Commit  string
+	Date    string
+}
 
-	verbose bool
+// NewRootCmd builds a fresh command tree. Constructing the tree rather than
+// sharing a package-level command keeps flag values out of globals, so tests
+// can execute the CLI repeatedly in one process without state leaking between
+// runs.
+func NewRootCmd(build BuildInfo) *cobra.Command {
+	var verbose bool
 
-	rootCmd = &cobra.Command{
+	root := &cobra.Command{
 		Use:   "mycli",
 		Short: "A brief description of your CLI",
 		Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application.`,
 
+		Version:       build.Version,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
@@ -36,24 +42,24 @@ examples and usage of using your application.`,
 			})))
 		},
 	}
-)
+
+	root.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose (debug) logging")
+
+	root.AddCommand(
+		newExampleCmd(),
+		newVersionCmd(build),
+	)
+
+	return root
+}
 
 // Execute runs the root command and returns an exit code.
 func Execute(ctx context.Context, version, commit, date string) int {
-	versionInfo.version = version
-	versionInfo.commit = commit
-	versionInfo.date = date
+	root := NewRootCmd(BuildInfo{Version: version, Commit: commit, Date: date})
 
-	rootCmd.Version = version
-
-	if err := rootCmd.ExecuteContext(ctx); err != nil {
+	if err := root.ExecuteContext(ctx); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		return 1
 	}
 	return 0
-}
-
-func init() {
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose (debug) logging")
-
 }
