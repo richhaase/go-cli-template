@@ -8,7 +8,6 @@ import (
 )
 
 var (
-	// Flags for the example command
 	exampleName  string
 	exampleCount int
 )
@@ -31,7 +30,6 @@ var exampleCmd = &cobra.Command{
 		slog.Debug("running example command", "message", message, "count", exampleCount)
 
 		for i := 0; i < exampleCount; i++ {
-			// Honor Ctrl-C / SIGTERM between iterations.
 			select {
 			case <-cmd.Context().Done():
 				return cmd.Context().Err()

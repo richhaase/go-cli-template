@@ -7,19 +7,12 @@ import (
 	"testing"
 )
 
-// executeCommand runs the root command with the given args and returns
-// the combined output. This is the standard pattern for testing Cobra
-// commands: point the command at a buffer and drive it via SetArgs.
 func executeCommand(t *testing.T, ctx context.Context, args ...string) (string, error) {
 	t.Helper()
 
-	// Reset flag-bound package globals so table cases don't leak state.
 	exampleName = "World"
 	exampleCount = 1
 
-	// Cobra only propagates the root context to a subcommand whose own
-	// context is still unset, so when re-executing a shared command tree
-	// across tests, set the context on the subcommand explicitly.
 	exampleCmd.SetContext(ctx)
 
 	buf := new(bytes.Buffer)
@@ -80,7 +73,7 @@ func TestExampleCommand(t *testing.T) {
 
 func TestExampleCommandCanceledContext(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
-	cancel() // already canceled: the command should do no work
+	cancel()
 
 	out, err := executeCommand(t, ctx, "example")
 	if !errors.Is(err, context.Canceled) {

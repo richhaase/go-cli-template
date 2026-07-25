@@ -7,13 +7,11 @@ run:
 linters:
   default: none
   enable:
-    # Default linters (gosimple is part of staticcheck in v2)
     - errcheck
     - govet
     - ineffassign
     - staticcheck
     - unused
-    # Additional useful linters
     - misspell
     - gosec
     - unconvert
@@ -28,13 +26,12 @@ linters:
         - os.RemoveAll
     gosec:
       excludes:
-        - G104 # Unhandled errors (covered by errcheck)
-        - G304 # File path from variable (often intentional in CLIs)
+        - G104
+        - G304
     misspell:
       locale: US
   exclusions:
     rules:
-      # Allow unused parameters in test helpers
       - path: _test\.go
         linters:
           - unparam

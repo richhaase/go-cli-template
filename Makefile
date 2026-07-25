@@ -1,11 +1,9 @@
 .PHONY: help build install run test test-coverage fmt fmt-check vet lint vuln check release-snapshot clean deps deps-list deps-update generate
 
-# Project configuration
 BINARY := mycli
 CMD_PATH := ./cmd/mycli
 BIN_DIR := bin
 
-# Pinned tool versions (keep the golangci-lint version in sync with .github/workflows/ci.yml)
 GOLANGCI_LINT_VERSION := v2.12.2
 
 help:

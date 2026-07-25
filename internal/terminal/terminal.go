@@ -1,5 +1,4 @@
-// Package terminal provides utilities for terminal output,
-// including color support and TTY detection.
+// Package terminal provides TTY detection helpers.
 package terminal
 
 import (
