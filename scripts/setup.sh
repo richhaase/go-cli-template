@@ -168,6 +168,9 @@ echo "  Location:    $PROJECT_ROOT"
 echo ""
 
 if [[ "$SKIP_CONFIRM" != true ]]; then
+    if [[ ! -t 0 ]]; then
+        error "Need a terminal to confirm. Pass --yes to proceed without confirming."
+    fi
     read -rp "Proceed with renaming? [Y/n] " confirm
     confirm=$(printf '%s' "$confirm" | tr '[:upper:]' '[:lower:]')
     if [[ "$confirm" == "n" || "$confirm" == "no" ]]; then
