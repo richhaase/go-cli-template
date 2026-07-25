@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   release:
+    if: github.repository != 'richhaase/go-cli-template'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
