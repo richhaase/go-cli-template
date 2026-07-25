@@ -36,8 +36,7 @@ make clean             # Clean build artifacts
 │   ├── config/         # Configuration loading
 │   └── terminal/       # TTY detection helpers
 ├── scripts/            # Bootstrap tooling (setup.sh)
-├── .github/workflows/  # CI and release automation
-└── docs/               # Additional documentation
+└── .github/workflows/  # CI and release automation
 ```
 
 ## Key Patterns
