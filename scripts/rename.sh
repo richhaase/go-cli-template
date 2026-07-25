@@ -193,6 +193,7 @@ for file in $FILES; do
         sed_inplace "s|github\.com/OWNER/REPO|github.com/$OWNER/$REPO|g" "$file"
         sed_inplace "s|OWNER/REPO|$OWNER/$REPO|g" "$file"
         sed_inplace "s|OWNER|$OWNER|g" "$file"
+        sed_inplace "s|REPO|$REPO|g" "$file"
 
         # Replace env-var prefix (MYCLI_*) before the lowercase binary name
         sed_inplace "s|MYCLI|$BINARY_UPPER|g" "$file"
