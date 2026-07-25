@@ -22,7 +22,7 @@ This CLI follows standard Go project layout with the following structure:
 - **cli/**: Command definitions and flag parsing
 - **domain/**: Pure business logic, no external dependencies
 - **config/**: Configuration loading from multiple sources
-- **terminal/**: Terminal I/O, colors, formatting
+- **terminal/**: TTY detection helpers
 
 ### Dependency Direction
 
@@ -50,8 +50,11 @@ The `domain` package should have zero external dependencies and contain only pur
 
 ## Configuration
 
-Configuration follows three-tier precedence:
+Configuration follows four-tier precedence:
 1. **Flags** - Command-line arguments (highest priority)
 2. **Environment** - `MYCLI_*` environment variables
-3. **Config file** - `.mycli.yaml` or `~/.config/mycli/config.yaml`
+3. **Config file** - `.mycli.yaml` or `config.yaml` in the user config
+   directory (`os.UserConfigDir()`, e.g. `$XDG_CONFIG_HOME/mycli/`).
+   Note: file discovery is wired up, but parsing is left as a TODO so the
+   template does not carry a YAML dependency — implement or remove per project.
 4. **Defaults** - Built-in defaults (lowest priority)

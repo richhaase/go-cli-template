@@ -7,51 +7,43 @@ run:
 linters:
   default: none
   enable:
-    # Default linters
+    # Default linters (gosimple is part of staticcheck in v2)
     - errcheck
-    - gosimple
     - govet
     - ineffassign
     - staticcheck
     - unused
     # Additional useful linters
-    - gofmt
-    - goimports
     - misspell
     - gosec
     - unconvert
     - unparam
+  settings:
+    errcheck:
+      exclude-functions:
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - (io.Closer).Close
+        - os.Remove
+        - os.RemoveAll
+    gosec:
+      excludes:
+        - G104 # Unhandled errors (covered by errcheck)
+        - G304 # File path from variable (often intentional in CLIs)
+    misspell:
+      locale: US
+  exclusions:
+    rules:
+      # Allow unused parameters in test helpers
+      - path: _test\.go
+        linters:
+          - unparam
 
-linters-settings:
-  errcheck:
-    exclude-functions:
-      - fmt.Fprintf
-      - fmt.Fprintln
-      - (io.Closer).Close
-      - os.Remove
-      - os.RemoveAll
-  gosec:
-    excludes:
-      - G104  # Unhandled errors (covered by errcheck)
-      - G304  # File path from variable (often intentional in CLIs)
-  goimports:
-    local-prefixes: github.com/OWNER/REPO
-  misspell:
-    locale: US
-
-issues:
-  exclude-rules:
-    # Allow unused parameters in test helpers
-    - path: _test\.go
-      linters:
-        - unparam
-    # Allow dot imports in tests for testify
-    - path: _test\.go
-      linters:
-        - revive
-      text: "dot-imports"
-
-output:
-  formats:
-    - format: colored-line-number
-  sort-results: true
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/OWNER/REPO

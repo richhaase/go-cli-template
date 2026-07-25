@@ -49,9 +49,10 @@ func findConfigFile() string {
 		return ".mycli.yaml"
 	}
 
-	// Check home directory
-	if home, err := os.UserHomeDir(); err == nil {
-		configPath := filepath.Join(home, ".config", "mycli", "config.yaml")
+	// Check the user config directory (respects XDG_CONFIG_HOME on
+	// Linux, ~/Library/Application Support on macOS, %AppData% on Windows)
+	if dir, err := os.UserConfigDir(); err == nil {
+		configPath := filepath.Join(dir, "mycli", "config.yaml")
 		if _, err := os.Stat(configPath); err == nil {
 			return configPath
 		}

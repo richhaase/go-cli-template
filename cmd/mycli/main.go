@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"os"
+	"os/signal"
 	"runtime/debug"
+	"syscall"
 
 	"github.com/OWNER/REPO/internal/cli"
 )
@@ -15,8 +18,18 @@ var (
 )
 
 func main() {
+	os.Exit(run())
+}
+
+// run is separate from main so deferred cleanup runs before os.Exit.
+func run() int {
+	// Cancel the context on Ctrl-C (SIGINT) or SIGTERM so commands
+	// reading cmd.Context() can stop in-flight work cleanly.
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
 	v, c, d := getVersionInfo()
-	os.Exit(cli.Execute(v, c, d))
+	return cli.Execute(ctx, v, c, d)
 }
 
 // getVersionInfo returns version info, preferring build-time values
@@ -36,13 +49,15 @@ func getVersionInfo() (string, string, string) {
 		version = info.Main.Version
 	}
 
-	// Extract commit and dirty status from build settings
+	// Extract commit, build date, and dirty status from build settings
 	for _, setting := range info.Settings {
 		switch setting.Key {
 		case "vcs.revision":
 			if len(setting.Value) >= 7 {
 				commit = setting.Value[:7]
 			}
+		case "vcs.time":
+			date = setting.Value
 		case "vcs.modified":
 			if setting.Value == "true" {
 				commit += "-dirty"
