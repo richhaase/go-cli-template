@@ -55,12 +55,12 @@ go install github.com/OWNER/REPO/cmd/mycli@latest
 
 Download the latest binary from [Releases](https://github.com/OWNER/REPO/releases).
 
-### Using just
+### Using make
 
 ```bash
 git clone https://github.com/OWNER/REPO.git
 cd REPO
-just install
+make install
 ```
 
 ## Usage
@@ -89,32 +89,32 @@ mycli version
 
 ## Development
 
-This project uses [just](https://github.com/casey/just) as a command runner.
+This project uses `make` as its command runner.
 
 ```bash
-# List available commands
-just
+# List available targets
+make help
 
 # Build the binary
-just build
+make build
 
 # Run tests
-just test
+make test
 
 # Run all quality checks (non-mutating: fmt-check, vet, lint, test)
-just check
+make check
 
 # Scan dependencies for known vulnerabilities
-just vuln
+make vuln
 
 # Update all dependencies to latest (run periodically to avoid rot)
-just deps-update
+make deps-update
 
 # Verify the GoReleaser config locally before tagging a release
-just release-snapshot
+make release-snapshot
 
 # Clean build artifacts
-just clean
+make clean
 ```
 
 ### Pre-commit hooks
