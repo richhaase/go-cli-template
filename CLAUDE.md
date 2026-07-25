@@ -77,6 +77,15 @@ Version info is injected at build time via ldflags:
 Falls back to `debug.ReadBuildInfo()` for `go install` builds.
 `--version` is also supported (rootCmd.Version is set in Execute()).
 
+### Go Version
+
+`go.mod` pins a full patch version (e.g. `go 1.26.5`), not just `1.26`. Every
+workflow resolves its toolchain with `go-version-file: go.mod`, so that line
+also decides which Go the CI jobs install. Lowering it to the bare language
+version silently builds against an unpatched standard library, and the `vuln`
+job will then fail on any project whose code actually reaches the affected
+stdlib paths. Bump it to a current patch release; do not round it down.
+
 ### Error Handling
 
 - Commands should use `RunE` and return errors
