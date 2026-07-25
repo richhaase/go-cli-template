@@ -36,8 +36,8 @@ repos:
 
       - id: go-lint
         name: golangci-lint
-        # Runs the version pinned in the justfile
-        entry: sh -c 'just lint'
+        # Runs the version pinned in the Makefile
+        entry: sh -c 'make lint'
         language: system
         types: [go]
         pass_filenames: false

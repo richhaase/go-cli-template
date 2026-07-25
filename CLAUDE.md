@@ -9,16 +9,16 @@ This is a Go CLI application built with Cobra. It follows standard Go project la
 ## Build & Test Commands
 
 ```bash
-just build             # Build with version info to bin/
-just install           # Install to GOBIN
-just test              # Run tests
-just lint              # Run golangci-lint (pinned version)
-just check             # Run all quality checks (fmt-check, vet, lint, test) — non-mutating
-just fmt               # Format code (rewrites files)
-just vuln              # Run govulncheck
-just release-snapshot  # Verify GoReleaser config locally (no publish)
-just deps-update       # Update all dependencies to latest
-just clean             # Clean build artifacts
+make build             # Build with version info to bin/
+make install           # Install to GOBIN
+make test              # Run tests
+make lint              # Run golangci-lint (pinned version)
+make check             # Run all quality checks (fmt-check, vet, lint, test) — non-mutating
+make fmt               # Format code (rewrites files)
+make vuln              # Run govulncheck
+make release-snapshot  # Verify GoReleaser config locally (no publish)
+make deps-update       # Update all dependencies to latest
+make clean             # Clean build artifacts
 ```
 
 ## Project Structure
@@ -105,7 +105,7 @@ binary name, env-var prefix, README cleanup, LICENSE):
 ```
 
 Manual equivalent:
-1. Update `BINARY` in `justfile`
+1. Update `BINARY` in `Makefile`
 2. Update `Use` in `internal/cli/root.go`
 3. Update `main` and `binary` in `.goreleaser.yaml`
 4. Update module path in `go.mod` and all imports
@@ -121,7 +121,7 @@ go mod tidy
 ### Create a Release
 
 ```bash
-just release-snapshot   # local dry-run of the GoReleaser config
+make release-snapshot   # local dry-run of the GoReleaser config
 git tag v1.0.0
 git push origin v1.0.0
 # GitHub Actions runs GoReleaser automatically
