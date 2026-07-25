@@ -102,25 +102,38 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+require_tty() {
+    if [[ ! -t 0 ]]; then
+        error "Need a terminal to ask for $1. Pass it as a flag, or use --yes to take the defaults."
+    fi
+}
+
 if [[ -z "$OWNER" ]]; then
+    require_tty "the GitHub owner (--owner)"
     read -rp "GitHub owner/organization: " OWNER
 fi
 
 if [[ -z "$REPO" ]]; then
+    require_tty "the repository name (--repo)"
     read -rp "Repository name: " REPO
 fi
 
 if [[ -z "$BINARY" ]]; then
     BINARY="$REPO"
-    read -rp "Binary name [$BINARY]: " input
-    BINARY="${input:-$BINARY}"
+    if [[ "$SKIP_CONFIRM" != true ]]; then
+        require_tty "the binary name (--binary)"
+        read -rp "Binary name [$BINARY]: " input
+        BINARY="${input:-$BINARY}"
+    fi
 fi
 
-if [[ -z "$DESCRIPTION" ]]; then
+if [[ -z "$DESCRIPTION" && "$SKIP_CONFIRM" != true ]]; then
+    require_tty "the description (--description)"
     read -rp "Short description (optional): " DESCRIPTION
 fi
 
 if [[ -z "$COPYRIGHT" && "$SKIP_CONFIRM" != true ]]; then
+    require_tty "the copyright holder (--copyright)"
     read -rp "Copyright holder for LICENSE [$OWNER]: " COPYRIGHT
 fi
 COPYRIGHT="${COPYRIGHT:-$OWNER}"

@@ -19,7 +19,7 @@ This is a GitHub template repository. To create a new CLI project:
 ### Option 2: Manual Clone
 
 ```bash
-git clone https://github.com/OWNER/REPO.git my-cli
+git clone https://github.com/richhaase/go-cli-template.git my-cli
 cd my-cli
 rm -rf .git
 git init
