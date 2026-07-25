@@ -102,38 +102,44 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-require_tty() {
+need_flag() {
     if [[ ! -t 0 ]]; then
-        error "Need a terminal to ask for $1. Pass it as a flag, or use --yes to take the defaults."
+        error "Need a terminal to ask for $1. Pass $2."
+    fi
+}
+
+need_flag_or_yes() {
+    if [[ ! -t 0 ]]; then
+        error "Need a terminal to ask for $1. Pass $2, or use --yes to take the defaults."
     fi
 }
 
 if [[ -z "$OWNER" ]]; then
-    require_tty "the GitHub owner (--owner)"
+    need_flag "the GitHub owner" "--owner"
     read -rp "GitHub owner/organization: " OWNER
 fi
 
 if [[ -z "$REPO" ]]; then
-    require_tty "the repository name (--repo)"
+    need_flag "the repository name" "--repo"
     read -rp "Repository name: " REPO
 fi
 
 if [[ -z "$BINARY" ]]; then
     BINARY="$REPO"
     if [[ "$SKIP_CONFIRM" != true ]]; then
-        require_tty "the binary name (--binary)"
+        need_flag_or_yes "the binary name" "--binary"
         read -rp "Binary name [$BINARY]: " input
         BINARY="${input:-$BINARY}"
     fi
 fi
 
 if [[ -z "$DESCRIPTION" && "$SKIP_CONFIRM" != true ]]; then
-    require_tty "the description (--description)"
+    need_flag_or_yes "the description" "--description"
     read -rp "Short description (optional): " DESCRIPTION
 fi
 
 if [[ -z "$COPYRIGHT" && "$SKIP_CONFIRM" != true ]]; then
-    require_tty "the copyright holder (--copyright)"
+    need_flag_or_yes "the copyright holder" "--copyright"
     read -rp "Copyright holder for LICENSE [$OWNER]: " COPYRIGHT
 fi
 COPYRIGHT="${COPYRIGHT:-$OWNER}"
