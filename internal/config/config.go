@@ -49,14 +49,26 @@ func findConfigFile() string {
 		return ".mycli.yaml"
 	}
 
-	// Check the user config directory (respects XDG_CONFIG_HOME on
-	// Linux, ~/Library/Application Support on macOS, %AppData% on Windows)
-	if dir, err := os.UserConfigDir(); err == nil {
+	if dir := configDir(); dir != "" {
 		configPath := filepath.Join(dir, "mycli", "config.yaml")
 		if _, err := os.Stat(configPath); err == nil {
 			return configPath
 		}
 	}
 
+	return ""
+}
+
+// configDir returns the XDG-style config directory on every platform:
+// $XDG_CONFIG_HOME if set, else ~/.config. CLI tools live in ~/.config
+// by convention, macOS included — os.UserConfigDir's
+// ~/Library/Application Support is for GUI apps.
+func configDir() string {
+	if dir := os.Getenv("XDG_CONFIG_HOME"); dir != "" {
+		return dir
+	}
+	if home, err := os.UserHomeDir(); err == nil {
+		return filepath.Join(home, ".config")
+	}
 	return ""
 }

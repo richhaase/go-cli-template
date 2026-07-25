@@ -1,6 +1,10 @@
 package config
 
-import "testing"
+import (
+	"os"
+	"path/filepath"
+	"testing"
+)
 
 func TestLoad(t *testing.T) {
 	tests := []struct {
@@ -49,4 +53,25 @@ func TestDefaultConfig(t *testing.T) {
 	if cfg.Debug {
 		t.Error("DefaultConfig().Debug = true, want false")
 	}
+}
+
+func TestConfigDir(t *testing.T) {
+	t.Run("XDG_CONFIG_HOME wins when set", func(t *testing.T) {
+		t.Setenv("XDG_CONFIG_HOME", "/custom/config")
+		if got := configDir(); got != "/custom/config" {
+			t.Errorf("configDir() = %q, want %q", got, "/custom/config")
+		}
+	})
+
+	t.Run("falls back to ~/.config on every platform", func(t *testing.T) {
+		t.Setenv("XDG_CONFIG_HOME", "")
+		home, err := os.UserHomeDir()
+		if err != nil {
+			t.Skipf("no home dir: %v", err)
+		}
+		want := filepath.Join(home, ".config")
+		if got := configDir(); got != want {
+			t.Errorf("configDir() = %q, want %q (never Application Support)", got, want)
+		}
+	})
 }
