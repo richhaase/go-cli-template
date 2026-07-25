@@ -102,25 +102,44 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+need_flag() {
+    if [[ ! -t 0 ]]; then
+        error "Need a terminal to ask for $1. Pass $2."
+    fi
+}
+
+need_flag_or_yes() {
+    if [[ ! -t 0 ]]; then
+        error "Need a terminal to ask for $1. Pass $2, or use --yes to take the defaults."
+    fi
+}
+
 if [[ -z "$OWNER" ]]; then
+    need_flag "the GitHub owner" "--owner"
     read -rp "GitHub owner/organization: " OWNER
 fi
 
 if [[ -z "$REPO" ]]; then
+    need_flag "the repository name" "--repo"
     read -rp "Repository name: " REPO
 fi
 
 if [[ -z "$BINARY" ]]; then
     BINARY="$REPO"
-    read -rp "Binary name [$BINARY]: " input
-    BINARY="${input:-$BINARY}"
+    if [[ "$SKIP_CONFIRM" != true ]]; then
+        need_flag_or_yes "the binary name" "--binary"
+        read -rp "Binary name [$BINARY]: " input
+        BINARY="${input:-$BINARY}"
+    fi
 fi
 
-if [[ -z "$DESCRIPTION" ]]; then
+if [[ -z "$DESCRIPTION" && "$SKIP_CONFIRM" != true ]]; then
+    need_flag_or_yes "the description" "--description"
     read -rp "Short description (optional): " DESCRIPTION
 fi
 
 if [[ -z "$COPYRIGHT" && "$SKIP_CONFIRM" != true ]]; then
+    need_flag_or_yes "the copyright holder" "--copyright"
     read -rp "Copyright holder for LICENSE [$OWNER]: " COPYRIGHT
 fi
 COPYRIGHT="${COPYRIGHT:-$OWNER}"
@@ -149,6 +168,9 @@ echo "  Location:    $PROJECT_ROOT"
 echo ""
 
 if [[ "$SKIP_CONFIRM" != true ]]; then
+    if [[ ! -t 0 ]]; then
+        error "Need a terminal to confirm. Pass --yes to proceed without confirming."
+    fi
     read -rp "Proceed with renaming? [Y/n] " confirm
     confirm=$(printf '%s' "$confirm" | tr '[:upper:]' '[:lower:]')
     if [[ "$confirm" == "n" || "$confirm" == "no" ]]; then
