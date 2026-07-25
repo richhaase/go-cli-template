@@ -2,13 +2,14 @@ package cli
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/spf13/cobra"
 )
 
 var (
 	// Flags for the example command
-	exampleName string
+	exampleName  string
 	exampleCount int
 )
 
@@ -18,6 +19,7 @@ var exampleCmd = &cobra.Command{
 	Long: `This is an example command that demonstrates common CLI patterns:
 - Positional arguments
 - Flag parsing
+- Context cancellation
 - Error handling`,
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -26,8 +28,16 @@ var exampleCmd = &cobra.Command{
 			message = args[0]
 		}
 
+		slog.Debug("running example command", "message", message, "count", exampleCount)
+
 		for i := 0; i < exampleCount; i++ {
-			fmt.Printf("%s, %s!\n", message, exampleName)
+			// Honor Ctrl-C / SIGTERM between iterations.
+			select {
+			case <-cmd.Context().Done():
+				return cmd.Context().Err()
+			default:
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "%s, %s!\n", message, exampleName)
 		}
 
 		return nil

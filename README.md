@@ -101,8 +101,17 @@ just build
 # Run tests
 just test
 
-# Run all quality checks
+# Run all quality checks (non-mutating: fmt-check, vet, lint, test)
 just check
+
+# Scan dependencies for known vulnerabilities
+just vuln
+
+# Update all dependencies to latest (run periodically to avoid rot)
+just deps-update
+
+# Verify the GoReleaser config locally before tagging a release
+just release-snapshot
 
 # Clean build artifacts
 just clean

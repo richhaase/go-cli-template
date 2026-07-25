@@ -3,6 +3,9 @@ BINARY := "mycli"
 CMD_PATH := "./cmd/mycli"
 BIN_DIR := "bin"
 
+# Pinned tool versions (keep the golangci-lint version in sync with .github/workflows/ci.yml)
+GOLANGCI_LINT_VERSION := "v2.12.2"
+
 # Default recipe: show available commands
 default:
     @just --list
@@ -44,29 +47,45 @@ test-coverage:
     go tool cover -html=coverage.out -o coverage.html
     @echo "Coverage report: coverage.html"
 
-# Format code
+# Format code (rewrites files)
 fmt:
     go fmt ./...
+    go tool goimports -w .
     @echo "Formatted all Go files"
+
+# Check formatting without modifying files (used by `check` / CI)
+fmt-check:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    unformatted=$(gofmt -l .)
+    if [ -n "$unformatted" ]; then
+        echo "Files need formatting (run 'just fmt'):"
+        echo "$unformatted"
+        exit 1
+    fi
 
 # Run go vet
 vet:
     go vet ./...
 
-# Run golangci-lint
+# Run golangci-lint (pinned version; includes staticcheck)
 lint:
-    go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest run
+    go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@{{GOLANGCI_LINT_VERSION}} run
 
-# Run staticcheck
-staticcheck:
-    go run honnef.co/go/tools/cmd/staticcheck@latest ./...
+# Scan dependencies for known vulnerabilities
+vuln:
+    go run golang.org/x/vuln/cmd/govulncheck@latest ./...
 
-# Run all quality checks
-check: fmt vet lint test
+# Run all quality checks (non-mutating, mirrors CI)
+check: fmt-check vet lint test
+
+# Verify the GoReleaser config with a local snapshot build (no publish)
+release-snapshot:
+    goreleaser release --snapshot --clean
 
 # Clean build artifacts
 clean:
-    rm -rf {{BIN_DIR}} coverage.out coverage.html
+    rm -rf {{BIN_DIR}} dist coverage.out coverage.html
     @echo "Cleaned build artifacts"
 
 # Update dependencies
