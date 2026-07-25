@@ -180,7 +180,7 @@ FILES=$(find . -type f \
     -not -path "./.git/*" \
     -not -path "./bin/*" \
     -not -path "./dist/*" \
-    -not -path "./scripts/rename.sh" \
+    -not -path "./scripts/setup.sh" \
     -not -name "LICENSE" \
     -not -name "*.sum" \
     -not -name "*.exe")
@@ -254,7 +254,7 @@ fi
 
 # Remove this script
 info "Cleaning up..."
-rm -f "$SCRIPT_DIR/rename.sh"
+rm -f "$SCRIPT_DIR/setup.sh"
 rmdir "$SCRIPT_DIR" 2>/dev/null || true
 success "Removed bootstrap script"
 

@@ -35,7 +35,7 @@ make clean             # Clean build artifacts
 │   ├── domain/         # Core business logic (no external deps)
 │   ├── config/         # Configuration loading
 │   └── terminal/       # TTY detection helpers
-├── scripts/            # Bootstrap tooling (rename.sh)
+├── scripts/            # Bootstrap tooling (setup.sh)
 ├── .github/workflows/  # CI and release automation
 └── docs/               # Additional documentation
 ```
@@ -101,7 +101,7 @@ Use the bootstrap script, which handles all of the below (module path,
 binary name, env-var prefix, README cleanup, LICENSE):
 
 ```bash
-./scripts/rename.sh -o myuser -r my-cli
+./scripts/setup.sh -o myuser -r my-cli
 ```
 
 Manual equivalent:

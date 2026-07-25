@@ -13,7 +13,7 @@ This is a GitHub template repository. To create a new CLI project:
 3. Run the bootstrap script:
 
 ```bash
-./scripts/rename.sh -o myuser -r my-cli
+./scripts/setup.sh -o myuser -r my-cli
 ```
 
 ### Option 2: Manual Clone
@@ -23,22 +23,22 @@ git clone https://github.com/OWNER/REPO.git my-cli
 cd my-cli
 rm -rf .git
 git init
-./scripts/rename.sh -o myuser -r my-cli
+./scripts/setup.sh -o myuser -r my-cli
 ```
 
 ### Bootstrap Options
 
 ```bash
-./scripts/rename.sh --help
+./scripts/setup.sh --help
 
 # Interactive mode
-./scripts/rename.sh
+./scripts/setup.sh
 
 # Non-interactive
-./scripts/rename.sh -o myuser -r my-cli -b mycmd -d "My awesome CLI tool"
+./scripts/setup.sh -o myuser -r my-cli -b mycmd -d "My awesome CLI tool"
 
 # Skip confirmation
-./scripts/rename.sh -o myuser -r my-cli -y
+./scripts/setup.sh -o myuser -r my-cli -y
 ```
 
 ---
